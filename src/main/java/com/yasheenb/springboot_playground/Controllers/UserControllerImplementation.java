@@ -2,10 +2,7 @@ package com.yasheenb.springboot_playground.Controllers;
 
 import com.yasheenb.springboot_playground.Models.User;
 import com.yasheenb.springboot_playground.Services.UserService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
@@ -20,6 +17,11 @@ public class UserControllerImplementation {
         this.userService = userService;
     }
 
+    @PostMapping("/addUser")
+    public User addUser(@RequestBody User user){
+        return userService.addUser(user);
+    }
+
     @GetMapping
     public List<User> getUsers(){
         return userService.getUsers();
@@ -29,4 +31,15 @@ public class UserControllerImplementation {
     public Optional<User> getUser(@PathVariable Long userID){
         return userService.getUser(userID);
     }
+
+    @PutMapping("updateUser/{userID}")
+    public User updateUser(@PathVariable Long userID, @RequestBody User user){
+        return userService.updateUser(userID, user);
+    }
+
+    @DeleteMapping("/{userID}")
+    public void deleteUser(@PathVariable Long userID){
+        userService.deleteUserByID(userID);
+    }
+
 }
