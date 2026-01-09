@@ -62,9 +62,10 @@ public class RewardsConfig {
 	public RewardsConfig(DataSource dataSource){
 		this.dataSource = dataSource;
 	}
+
 	@Bean
-	public RewardNetwork rewardNetwork(AccountRepository accountRepository, RestaurantRepository restaurantRepository, RewardRepository rewardRepository){
-		return new RewardNetworkImpl(accountRepository, restaurantRepository, rewardRepository);
+	public RewardNetwork rewardNetwork(){
+		return new RewardNetworkImpl(accountRepository(), restaurantRepository(), rewardRepository());
 	}
 
 	@Bean
