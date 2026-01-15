@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Repository;
 
+import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -35,18 +36,20 @@ public class JdbcRestaurantRepository implements RestaurantRepository {
 	 * restaurants. When the instance of JdbcRestaurantRepository is created, a
 	 * Restaurant cache is populated for read only access
 	 */
-	// Use @Autowired to force Spring to call this constructor and inject the Datasource.
-	// If @Autowired not used, no arg constructor would be called.
-	@Autowired
 	public JdbcRestaurantRepository(DataSource dataSource) {
 		this.dataSource = dataSource;
-		this.populateRestaurantCache();
+		// Used to populate the restaurant cache in the constructor - a map of restaurants with the key being the merchant number.
+		// The constructor is meant to only initialize the object so moved the populating of the cache into a method annotated
+		// with @PostConstruct.
+
 	}
 
-	// If the above constructor was not annotated with @Autowired, this constructor would be called.
 	public JdbcRestaurantRepository() {
+		// no-args constructor called by Spring as @Autowired not used on any constructor.
 	}
 
+	// Inject the Datasource dependency using setter based injection.
+	@Autowired
 	public void setDataSource(DataSource dataSource) {
 		this.dataSource = dataSource;
 	}
@@ -61,16 +64,9 @@ public class JdbcRestaurantRepository implements RestaurantRepository {
 	 * by their merchant numbers. This method should be called on initialization.
 	 */
 
-	/*
-	 * TODO-09: Make this method to be invoked after a bean gets created
-	 * - Mark this method with an annotation that will cause it to be
-	 *   executed by Spring after constructor & setter initialization has occurred.
-	 * - Re-run the RewardNetworkTests test. You should see the test succeeds.
-	 * - Note that populating the cache is not really a valid
-	 *   construction activity, so using a post-construct, rather than
-	 *   the constructor, is a better practice.
-	 */
-
+	// Call the method below after initializing this bean and making available the dependencies required by it.
+	// @PostConstruct and @PreDestroy was introduced in JDK 6.
+	@PostConstruct
 	void populateRestaurantCache() {
 		restaurantCache = new HashMap<String, Restaurant>();
 		String sql = "select MERCHANT_NUMBER, NAME, BENEFIT_PERCENTAGE from T_RESTAURANT";
