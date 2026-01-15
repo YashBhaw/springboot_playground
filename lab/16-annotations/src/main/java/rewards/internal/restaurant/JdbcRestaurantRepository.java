@@ -1,7 +1,9 @@
 package rewards.internal.restaurant;
 
 import common.money.Percentage;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -17,33 +19,7 @@ import java.util.Map;
  * This implementation should cache restaurants to improve performance. The
  * cache should be populated on initialization and cleared on destruction.
  */
-
-/* TODO-06: Let this class to be found in component-scanning
- * - Annotate the class with an appropriate stereotype annotation
- *   to cause component-scanning to detect and load this bean.
- * - Inject dataSource. Use constructor injection in this case.
- *   Note that there are already two constructors, one of which
- *   is no-arg constructor.
- */
-
-/*
- * TODO-08: Use Setter injection for DataSource
- * - Change the configuration to set the dataSource
- *   property using setDataSource().
- *
- *   To do this, you must MOVE the @Autowired annotation
- *   you might have set in the previous step on the
- *   constructor injecting DataSource.
- *   So neither constructor should be annotated with
- *   @Autowired now, so Spring uses
- *   the default constructor by default.
- *
- * - Re-run the test. It should fail.
- * - Examine the stack trace and see if you can
- *   understand why. (If not, refer to lab document).
- *   We will fix this error in the next step.
- */
-
+@Repository
 public class JdbcRestaurantRepository implements RestaurantRepository {
 
 	private DataSource dataSource;
@@ -59,12 +35,15 @@ public class JdbcRestaurantRepository implements RestaurantRepository {
 	 * restaurants. When the instance of JdbcRestaurantRepository is created, a
 	 * Restaurant cache is populated for read only access
 	 */
-
+	// Use @Autowired to force Spring to call this constructor and inject the Datasource.
+	// If @Autowired not used, no arg constructor would be called.
+	@Autowired
 	public JdbcRestaurantRepository(DataSource dataSource) {
 		this.dataSource = dataSource;
 		this.populateRestaurantCache();
 	}
 
+	// If the above constructor was not annotated with @Autowired, this constructor would be called.
 	public JdbcRestaurantRepository() {
 	}
 
