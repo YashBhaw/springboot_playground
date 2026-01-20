@@ -90,7 +90,7 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 @ExtendWith(SpringExtension.class) // Allows for us to create a Test Context
 @ContextConfiguration(classes = TestInfrastructureConfig.class)
-@ActiveProfiles("stub")
+@ActiveProfiles({"stub", "local"})
 // The above two is composed into the @SpringJunitConfig() annotation.
 public class RewardNetworkTests {
 
