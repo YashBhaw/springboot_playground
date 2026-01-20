@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -89,6 +90,7 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 @ExtendWith(SpringExtension.class) // Allows for us to create a Test Context
 @ContextConfiguration(classes = TestInfrastructureConfig.class)
+@ActiveProfiles("stub")
 // The above two is composed into the @SpringJunitConfig() annotation.
 public class RewardNetworkTests {
 
