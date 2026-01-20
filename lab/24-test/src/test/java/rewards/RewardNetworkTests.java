@@ -1,6 +1,7 @@
 package rewards;
 
 import common.money.MonetaryAmount;
+import config.RewardsConfig;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -9,7 +10,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -89,7 +92,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * - Run the test again.
  */
 @ExtendWith(SpringExtension.class) // Allows for us to create a Test Context
-@ContextConfiguration(classes = TestInfrastructureConfig.class)
+@ContextConfiguration()
 @ActiveProfiles({"stub", "local"})
 // The above two is composed into the @SpringJunitConfig() annotation.
 public class RewardNetworkTests {
@@ -140,4 +143,20 @@ public class RewardNetworkTests {
 				() -> assertEquals(MonetaryAmount.valueOf("4.00"), contribution.getDistribution("Annabelle").getAmount()),
 				() -> assertEquals(MonetaryAmount.valueOf("4.00"), contribution.getDistribution("Corgan").getAmount()));
 	}
+	@Configuration
+	@Import({
+			TestInfrastructureLocalConfig.class,
+			TestInfrastructureJndiConfig.class,
+			RewardsConfig.class })
+	static class TestInfrastructureConfig {
+
+		/**
+		 * The bean logging post-processor from the bean lifecycle slides.
+		 */
+		@Bean
+		public static LoggingBeanPostProcessor loggingBean(){
+			return new LoggingBeanPostProcessor();
+		}
+	}
+
 }
