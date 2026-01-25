@@ -2,6 +2,9 @@ package rewards.internal.restaurant;
 
 import common.money.Percentage;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
+import org.springframework.lang.Nullable;
 import rewards.Dining;
 import rewards.internal.account.Account;
 
@@ -39,43 +42,15 @@ import java.sql.SQLException;
 public class JdbcRestaurantRepository implements RestaurantRepository {
 
 	private DataSource dataSource;
+	private final JdbcTemplate jdbcTemplate;
 
 	public JdbcRestaurantRepository(DataSource dataSource) {
 		this.dataSource = dataSource;
+		this.jdbcTemplate = new JdbcTemplate(dataSource);
 	}
 
 	public Restaurant findByMerchantNumber(String merchantNumber) {
-		String sql = "select MERCHANT_NUMBER, NAME, BENEFIT_PERCENTAGE, BENEFIT_AVAILABILITY_POLICY"
-				+ " from T_RESTAURANT where MERCHANT_NUMBER = ?";
-		Restaurant restaurant = null;
-
-		try (Connection conn = dataSource.getConnection();
-			 PreparedStatement ps = conn.prepareStatement(sql) ){
-			ps.setString(1, merchantNumber);
-			ResultSet rs = ps.executeQuery();
-			advanceToNextRow(rs);
-			restaurant = mapRestaurant(rs);
-		} catch (SQLException e) {
-			throw new RuntimeException("SQL exception occurred finding by merchant number", e);
-		}
-
-		return restaurant;
-	}
-
-	/**
-	 * Maps a row returned from a query of T_RESTAURANT to a Restaurant object.
-	 * @param rs the result set with its cursor positioned at the current row
-	 */
-	private Restaurant mapRestaurant(ResultSet rs) throws SQLException {
-		// Get the row column data
-		String name = rs.getString("NAME");
-		String number = rs.getString("MERCHANT_NUMBER");
-		Percentage benefitPercentage = Percentage.valueOf(rs.getString("BENEFIT_PERCENTAGE"));
-
-		// Map to the object
-		Restaurant restaurant = new Restaurant(number, name);
-		restaurant.setBenefitPercentage(benefitPercentage);
-		restaurant.setBenefitAvailabilityPolicy(mapBenefitAvailabilityPolicy(rs));
+		Restaurant restaurant = jdbcTemplate.queryForObject("select MERCHANT_NUMBER, NAME, BENEFIT_PERCENTAGE, BENEFIT_AVAILABILITY_POLICY from T_RESTAURANT where MERCHANT_NUMBER = ?", new ResturantRowMapper(), merchantNumber);
 		return restaurant;
 	}
 
@@ -144,5 +119,33 @@ public class JdbcRestaurantRepository implements RestaurantRepository {
 		public String toString() {
 			return "neverAvailable";
 		}
+	}
+
+	/**
+	 * RowMapper callback to map a new Restaurant from a ResultSet.
+	 */
+	private class ResturantRowMapper implements RowMapper<Restaurant>{
+		@Nullable
+		@Override
+		public Restaurant mapRow(ResultSet rs, int rowNum) throws SQLException {
+			return mapRestaurant(rs);
+		}
+	}
+
+	/**
+	 * Maps a row returned from a query of T_RESTAURANT to a Restaurant object.
+	 * @param rs the result set with its cursor positioned at the current row
+	 */
+	private Restaurant mapRestaurant(ResultSet rs) throws SQLException {
+		// Get the row column data
+		String name = rs.getString("NAME");
+		String number = rs.getString("MERCHANT_NUMBER");
+		Percentage benefitPercentage = Percentage.valueOf(rs.getString("BENEFIT_PERCENTAGE"));
+
+		// Map to the object
+		Restaurant restaurant = new Restaurant(number, name);
+		restaurant.setBenefitPercentage(benefitPercentage);
+		restaurant.setBenefitAvailabilityPolicy(mapBenefitAvailabilityPolicy(rs));
+		return restaurant;
 	}
 }
