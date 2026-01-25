@@ -15,26 +15,12 @@ import java.sql.SQLException;
 /**
  * Loads accounts from a data source using the JDBC API.
  */
-
-// TODO-10 (Optional) : Inject JdbcTemplate directly to this repository class
-// - Refactor the constructor to get the JdbcTemplate injected directly
-//   (instead of DataSource getting injected)
-// - Refactor RewardsConfig accordingly
-// - Refactor JdbcAccountRepositoryTests accordingly
-// - Run JdbcAccountRepositoryTests and verity it passes
-
-// TODO-05: Refactor this repository to use JdbcTemplate.
-// - Add a field of type JdbcTemplate.
-// - Refactor the code in the constructor to instantiate the JdbcTemplate
-//   object using the given DataSource object.
 public class JdbcAccountRepository implements AccountRepository {
 
-	private DataSource dataSource;
 	private final JdbcTemplate jdbcTemplate;
 
-	public JdbcAccountRepository(DataSource dataSource) {
-		this.dataSource = dataSource;
-		this.jdbcTemplate = new JdbcTemplate(dataSource);
+	public JdbcAccountRepository(JdbcTemplate jdbcTemplate) {
+		this.jdbcTemplate = jdbcTemplate;
 	}
 
 	public Account findByCreditCard(String creditCardNumber) {

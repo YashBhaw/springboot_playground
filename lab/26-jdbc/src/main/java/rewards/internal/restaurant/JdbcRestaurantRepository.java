@@ -17,36 +17,12 @@ import java.sql.SQLException;
 /**
  * Loads restaurants from a data source using the JDBC API.
  */
-
-// TODO-09 (Optional) : Inject JdbcTemplate directly to this repository class
-// - Refactor the constructor to get the JdbcTemplate injected directly
-//   (instead of DataSource getting injected)
-// - Refactor RewardsConfig accordingly
-// - Refactor JdbcRestaurantRepositoryTests accordingly
-// - Run JdbcRestaurantRepositoryTests and verity it passes
-
-// TODO-04: Refactor the cumbersome low-level JDBC code to use JdbcTemplate.
-// - Run JdbcRestaurantRepositoryTests and verity it passes
-// - Add a field of type JdbcTemplate
-// - Refactor the code in the constructor to instantiate JdbcTemplate object
-//   from the given DataSource object
-// - Refactor findByMerchantNumber(..) to use the JdbcTemplate and a RowMapper
-//
-//   #1: Create a RowMapper object and pass it to the
-//       jdbcTemplate.queryForObject(..) method as an argument
-//	 #2: The mapRestaurant(..) method provided in this class contains
-//	     logic, which the RowMapper may wish to use
-//
-// - Run JdbcRestaurantRepositoryTests again and verity it passes
-
 public class JdbcRestaurantRepository implements RestaurantRepository {
 
-	private DataSource dataSource;
 	private final JdbcTemplate jdbcTemplate;
 
-	public JdbcRestaurantRepository(DataSource dataSource) {
-		this.dataSource = dataSource;
-		this.jdbcTemplate = new JdbcTemplate(dataSource);
+	public JdbcRestaurantRepository(JdbcTemplate jdbcTemplate) {
+		this.jdbcTemplate = jdbcTemplate;
 	}
 
 	public Restaurant findByMerchantNumber(String merchantNumber) {
